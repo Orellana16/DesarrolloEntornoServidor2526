@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-MapaApplication<mapa>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.calabozo.mapa.MapaApplication",
+            "projectName": "mapa",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
