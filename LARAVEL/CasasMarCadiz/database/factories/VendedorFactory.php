@@ -2,26 +2,43 @@
 
 namespace Database\Factories;
 
+use App\Models\Vendedor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ * Factory para generar vendedores ficticios
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Vendedor>
  */
 class VendedorFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Vendedor::class;
+
     public function definition(): array
     {
+        $sexo = fake()->randomElement(['M', 'F']);
+
         return [
-            'nombre' => fake()->name('male'),
-            'nif' => fake()->uniqid(),
-            'fecha_nac' => fake()->date(),
-            'sexo' => rand(10) > 5 ? 'M' : 'F',
-            'sueldo_base' => fake()->randomFloat(min: 25000, max: 150000),
+            'nombre' => fake()->name($sexo === 'M' ? 'male' : 'female'),
+
+            'nif' => fake()->unique()->regexify('[0-9]{8}[A-Z]'),
+
+            // Vendedores entre 21 y 65 años (edad laboral)
+            'fecha_nac' => fake()->dateTimeBetween('-65 years', '-21 years')->format('Y-m-d'),
+
+            'sexo' => $sexo,
+
+            // Sintaxis correcta: randomFloat(decimales, min, max)
+            'sueldo_base' => fake()->randomFloat(2, 15000, 80000),
         ];
+    }
+
+    /**
+     * Estado: Vendedor senior (sueldo alto)
+     */
+    public function senior(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'sueldo_base' => fake()->randomFloat(2, 60000, 120000),
+        ]);
     }
 }
