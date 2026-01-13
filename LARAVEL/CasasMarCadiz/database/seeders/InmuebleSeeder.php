@@ -20,7 +20,8 @@ class InmuebleSeeder extends Seeder
 
         // Crear 100 inmuebles asignados a vendedores existentes
         Inmueble::factory(100)->create([
-            'vendedor_id' => fn() => $vendedores->random()->id,
+            //fn() =>
+            'vendedor_id' =>  $vendedores->random()->id,
         ]);
 
         $this->command->info('✅ 100 inmuebles creados');

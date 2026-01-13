@@ -20,12 +20,11 @@ class InmuebleCompradorSeeder extends Seeder
         }
 
         // Crear 100 transacciones de compra
-        for ($i = 0; $i < 100; $i++) {
-            InmuebleComprador::factory()->create([
-                'comprador_id' => $compradores->random()->id,
-                'inmueble_id' => $inmuebles->random()->id,
-            ]);
-        }
+
+        InmuebleComprador::factory(100)->create([
+            'comprador_id' => $compradores->random()->id,
+            'inmueble_id' => $inmuebles->random()->id,
+        ]);
 
         $this->command->info('✅ 100 transacciones creadas');
     }

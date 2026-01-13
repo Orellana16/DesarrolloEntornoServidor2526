@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('nombre');
-            $table->string('nif', 100);
+            $table->string('nif', 100)->unique();
             $table->date('fecha_nac');
             $table->string('sexo');
         });

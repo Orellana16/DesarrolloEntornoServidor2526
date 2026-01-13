@@ -55,8 +55,7 @@ class Vendedor extends Model
     {
         return $this->hasMany(
             Inmueble::class,    // Modelo relacionado
-            'vendedor_id',      // FK en la tabla inmueble
-            'id'                // PK local (opcional, por defecto 'id')
+            'vendedor_id'      // FK en la tabla inmueble
         );
     }
 

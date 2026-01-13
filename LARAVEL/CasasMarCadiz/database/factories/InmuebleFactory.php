@@ -16,6 +16,8 @@ class InmuebleFactory extends Factory
 
     public function definition(): array
     {
+
+        $city = fake()->city();
         return [
             // Tipo de inmueble más descriptivo
             'nombre' => fake()->randomElement([
@@ -27,17 +29,16 @@ class InmuebleFactory extends Factory
                 'Casa',
                 'Estudio',
                 'Loft'
-            ]) . ' en ' . fake()->city(),
+            ]) . ' en ' . $city,
 
             // Sintaxis correcta de randomFloat
             'precio' => fake()->randomFloat(2, 50000, 1000000),
 
-            'direccion' => fake()->streetAddress() . ', ' . fake()->city(),
+            'direccion' => fake()->streetAddress() . ', ' . $city,
 
             // Metros más realistas según tipo
             'metros' => fake()->numberBetween(30, 500),
 
-            // ✅ CORREGIDO: Usar Vendedor::factory() en lugar de User::factory()
             'vendedor_id' => Vendedor::factory(),
         ];
     }
