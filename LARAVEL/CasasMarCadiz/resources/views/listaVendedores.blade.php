@@ -11,13 +11,13 @@
 <div class="container my-4">
     <h1 class="mb-4">Lista de Vendedores</h1>
 
-    @if(isset($mensaje_eliminar) && $mensaje_eliminar == 'error_eliminar')
+    @if(session('mensaje_eliminar') == 'error_eliminar')
         <div class="alert alert-warning fade show">
             No se pudo eliminar el vendedor
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @elseif(isset($mensaje_eliminar) && $mensaje_eliminar == 'Eliminado')
-        <div class="alert alert-success ">
+    @elseif(session('mensaje_eliminar') == 'eliminado')
+        <div class="alert alert-success fade show">
             Se elimino correctamente el vendedor
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>

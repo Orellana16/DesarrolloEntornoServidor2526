@@ -12,6 +12,10 @@ use App\Http\Controllers\VendedorController;
 Route::get('/', [VendedorController::class, 'index'])->name('listadoVendedores');
 Route::get('/mostrar/{id}', [VendedorController::class, 'show'])->name('mostrarVendedor');
 Route::get('/vendedores/{id}/eliminar', [VendedorController::class, 'destroy'])->name('eliminarVendedor');
+Route::get('/vendedores/crear', [VendedorController::class, 'create'])->name('crearVendedor');
+Route::post('/vendedores', [VendedorController::class, 'store'])->name('guardarVendedor');
+Route::get('/vendedores/{id}/editar', [VendedorController::class, 'edit'])->name('editarVendedor');
+Route::put('/vendedores/{id}', [VendedorController::class, 'update'])->name('actualizarVendedor');
 
 
 Route::get('/hola', function () {

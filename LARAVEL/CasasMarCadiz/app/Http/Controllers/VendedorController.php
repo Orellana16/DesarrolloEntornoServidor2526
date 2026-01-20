@@ -30,22 +30,43 @@ class VendedorController extends Controller
         $mensaje = 'exito';
         if ($vendedor == null) $mensaje = 'error';
 
-        return view('detalleVendedor', compact('mensaje', 'vendedor', 'mensaje_eliminar'));
+        return view('detalleVendedor', compact('mensaje', 'vendedor'));
     }
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        //
+        return view('crearVendedor');
     }
 
     /**
      * Store a newly created resource in storage.
+     * En el request nos llegan todos los datos del formulario si es post
      */
     public function store(Request $request)
     {
-        //
+        $request->validate(
+            [
+                'nombre' => 'required|max:100',
+                'nif' => 'required|max:9|unique|string',
+                'fecha_nac' => 'date|required',
+                'sexo' => 'in:M,F,O',
+                'sueldo_base' => 'required|numeric|min:0',
+            ]
+        );
+
+        $vendedor = Vendedor::create([
+            $request->all()
+        ]);
+        /* Equivalente a 
+        $vendedor = Vendedor::create([
+            'nombre' => $request->nombre,
+            'nif'=>$request->nif,
+            ...
+            ...
+        ]);
+  */
     }
 
 
@@ -53,10 +74,7 @@ class VendedorController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Vendedor $vendedor)
-    {
-        //
-    }
+    public function edit(Vendedor $vendedor) {}
 
     /**
      * Update the specified resource in storage.
@@ -72,7 +90,7 @@ class VendedorController extends Controller
     public function destroy($id)
     {
         $vendedor = Vendedor::find($id);
-        $mensaje_eliminar = 'Eliminado';
+        $mensaje_eliminar = 'eliminado';
 
         if ($vendedor == null)
             $mensaje_eliminar = 'error_eliminar';
@@ -80,6 +98,9 @@ class VendedorController extends Controller
             $vendedor->delete();
 
         //Redireccionamos al listado principal para que cargue los vendedores y los muestre actualizados
-        return redirect()->route('listadoVendedores', ['mensaje_eliminar' => $mensaje_eliminar]);
+        //Con el array asociativo llega en la url y se recoge con request en la vista
+        //return redirect()->route('listadoVendedores', ['mensaje_eliminar' => $mensaje_eliminar]);
+        //si se hace con with(key,value), se pasan los valores en la sesion y se recogen con session()
+        return redirect()->route('listadoVendedores')->with('mensaje_eliminar', $mensaje_eliminar);
     }
 }
