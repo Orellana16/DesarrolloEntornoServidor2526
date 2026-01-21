@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Vendedor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // <--- FALTA ESTA IMPORTACIÓN
 
 class VendedorController extends Controller
 {
@@ -12,13 +13,34 @@ class VendedorController extends Controller
      */
     public function index()
     {
-        //Cargamos los primeros 1o vendedores ordenados por nombre
-        $vendedores = Vendedor::orderBy('nombre')->limit(10)->get();
-        $mensaje = 'exito';
-        if (count($vendedores) == 0) $mensaje = 'vacio';
+        // Cargamos los vendedores vinculados al usuario con paginación
+        // Nota: Asegúrate de tener la relación 'vendedores' en el modelo User
+        $vendedores = Auth::user()->vendedores()->paginate(5);
 
-        //Devolvemos la lista
+        // Determinamos el mensaje según si hay resultados
+        $mensaje = ($vendedores->count() === 0) ? 'vacio' : 'exito';
+
+        // Devolvemos la vista con los datos
         return view('listaVendedores', compact('mensaje', 'vendedores'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|max:100',
+            'nif' => 'required|max:9|unique:vendedor,nif|string', 
+            'fecha_nac' => 'required|date',
+            'sexo' => 'required|in:M,F,O',
+            'sueldo_base' => 'required|numeric|min:0',
+        ]);
+
+        // Crear vinculado al usuario logueado usando la relación
+        Auth::user()->vendedores()->create($validated);
+
+        return redirect()->route('listadoVendedores')->with('mensaje_exito', 'Vendedor Creado Correctamente');
     }
 
     /**
@@ -26,91 +48,50 @@ class VendedorController extends Controller
      */
     public function show($id)
     {
-        $vendedor = Vendedor::find($id);
+        // findOrFail es mejor: si no existe, lanza un 404 automáticamente
+        $vendedor = Vendedor::findOrFail($id);
         $mensaje = 'exito';
-        if ($vendedor == null) $mensaje = 'error';
 
         return view('detalleVendedor', compact('mensaje', 'vendedor'));
     }
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         return view('crearVendedor');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * En el request nos llegan todos los datos del formulario si es post
-     */
-    public function store(Request $request)
-    {
-        $request->validate(
-            [
-                'nombre' => 'required|max:100',
-                'nif' => 'required|max:9|unique:vendedor,nif|string',
-                'fecha_nac' => 'date|required',
-                'sexo' => 'in:M,F,O',
-                'sueldo_base' => 'required|numeric|min:0',
-            ]
-        );
-
-        $vendedor = Vendedor::create(
-            $request->all()
-        );
-
-        /*
-        $vendedor = Vendedor::create([
-            'nombre' => $request->nombre,
-            'nif' => $request->nif,
-            'fecha_nac' => $request->fecha_nac,
-            'sexo' => $request->sexo,
-            'sueldo_base' => $request->sueldo_base,
-        ]);
-*/
-
-        return redirect()->route('listadoVendedores')->with('mensaje_exito', 'Vendedor Creado Correctamente');
-    }
-
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
-
-        $vendedor = Vendedor::find($id);
-
+        $vendedor = Vendedor::findOrFail($id);
         return view('editarVendedor', compact('vendedor'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Vendedor $vendedor)
+    public function update(Request $request, $id)
     {
-        //
+        $vendedor = Vendedor::findOrFail($id);
+
+        $validated = $request->validate([
+            'nombre' => 'required|max:100',
+            'nif' => 'required|max:9|unique:vendedor,nif,' . $vendedor->id,
+            'fecha_nac' => 'required|date',
+            'sexo' => 'required|in:M,F,O',
+            'sueldo_base' => 'required|numeric|min:0',
+        ]);
+
+        $vendedor->update($validated);
+
+        return redirect()->route('listadoVendedores')->with('mensaje_exito', 'Vendedor Actualizado');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         $vendedor = Vendedor::find($id);
-        $mensaje_eliminar = 'eliminado';
+        
+        if (!$vendedor) {
+            return redirect()->route('listadoVendedores')->with('mensaje_eliminar', 'error_eliminar');
+        }
 
-        if ($vendedor == null)
-            $mensaje_eliminar = 'error_eliminar';
-        else
-            $vendedor->delete();
-
-        //Redireccionamos al listado principal para que cargue los vendedores y los muestre actualizados
-        //Con el array asociativo llega en la url y se recoge con request en la vista
-        //return redirect()->route('listadoVendedores', ['mensaje_eliminar' => $mensaje_eliminar]);
-        //si se hace con with(key,value), se pasan los valores en la sesion y se recogen con session()
-        return redirect()->route('listadoVendedores')->with('mensaje_eliminar', $mensaje_eliminar);
+        $vendedor->delete();
+        return redirect()->route('listadoVendedores')->with('mensaje_eliminar', 'eliminado');
     }
 }

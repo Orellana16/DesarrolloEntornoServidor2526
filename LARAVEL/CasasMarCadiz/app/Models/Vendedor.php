@@ -35,6 +35,7 @@ class Vendedor extends Model
         'fecha_nac',
         'sexo',
         'sueldo_base',
+        'user_id',
     ];
 
     protected $casts = [
@@ -57,6 +58,10 @@ class Vendedor extends Model
             Inmueble::class,    // Modelo relacionado
             'vendedor_id'      // FK en la tabla inmueble
         );
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
     }
 
     // ════════════════════════════════════════════════════════════

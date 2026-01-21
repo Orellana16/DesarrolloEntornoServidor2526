@@ -79,6 +79,11 @@
                         @endforeach
                     </tbody>
                 </table>
+            <div class="card-footer bg-white py-3">
+                <div class="d-flex justify-content-center">
+                    {{ $vendedores->links('pagination::bootstrap-5') }}
+                </div>
+            </div>
             </div>
         </div>
     @endif
